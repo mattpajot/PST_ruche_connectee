@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8"/>
+      <title>Ruche connectée</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  </head>
+  <body>
+    <div id="app">
+      <v-app>
+            <v-toolbar height="200" color="black">
+               <v-container>
+                  <v-row>
+                     <v-col>
+                        <v-container>
+                           <v-img src="images/logo.png" width=100 @click="menu = true"> </v-img>
+                              <v-dialog
+                                transition="dialog-bottom-transition"
+                                max-width="600"
+                                v-model="menu"
+                              >
+                              <v-card>
+                                <v-list dense>
+                                 <v-subheader>Etudiants</v-subheader>
+                                 <v-list-item-group
+                                   color="primary"
+                                 >
+                                   <v-list-item v-for="etudiant in etudiants">
+                                     <v-list-item-icon>
+                                       <v-icon large>mdi-school-outline</v-icon>
+                                     </v-list-item-icon>
+                                     <v-list-item-content>
+                                       <v-list-item-title>{{etudiant}}</v-list-item-title>
+                                     </v-list-item-content>
+                                   </v-list-item>
+                                 </v-list-item-group>
+                               </v-list>
+                                <v-card-actions>
+                                  <v-spacer></v-spacer>
+                                  <v-btn
+                                    text
+                                    @click="menu = false"
+                                  >
+                                    Quitter
+                                  </v-btn>
+                                </v-card-actions>
+                              </v-card>
+                           </v-dialog>
+                        </v-container>
+                     </v-col>
+                     <v-col>
+                        <h1>
+                           <font color="white">Ma ruche connectée</font>
+                        </h1>
+                     </v-col>
+                     <v-col cols="1">
+                        <v-dialog
+                           v-model="dialog"
+                           fullscreen
+                           hide-overlay
+                           transition="dialog-bottom-transition"
+                         >
+                           <template v-slot:activator="{ on, attrs }">
+                              <v-btn
+                                block
+                                text
+                                color="yellow"
+                                height="50"
+                                v-bind="attrs"
+                                v-on="on"
+                              >
+                                    <v-icon large>mdi-beehive-outline</v-icon>
+                           </template>
+                           <v-card>
+                             <v-toolbar
+                               dark
+                               color="yellow"
+                             >
+                               <v-btn
+                                 icon
+                                 dark
+                                 @click="dialog = false"
+                               >
+                                 <v-icon>mdi-close</v-icon>
+                               </v-btn>
+                               <v-toolbar-title>
+                                 <h1>
+                                    <font color="black">Ma ruche : {{ device }}
+                                    </font>
+                                 </h1>
+                               </v-toolbar-title>
+                             </v-toolbar>
+                             <v-list
+                               three-line
+                               subheader
+                             >
+                               <v-subheader>Informations sur ma ruche</v-subheader>
+                               <v-list-item>
+                                 <v-list-item-content>
+                                   <v-list-item-title>Informations techniques</v-list-item-title>
+                                   <v-list-item-subtitle>Pays : France</v-list-item-subtitle>
+                                   <v-list-item-subtitle>Id : {{ device }}</v-list-item-subtitle>
+                                   <v-list-item-subtitle>Réseau : Sigfox</v-list-item-subtitle>
+                                 </v-list-item-content>
+                               </v-list-item>
+                               <v-list-item>
+                                 <v-list-item-content>
+                                   <v-list-item-title>Activité</v-list-item-title>
+                                   <v-list-item-subtitle>Nombre de messages reçus : {{ messages.length }}</v-list-item-subtitle>
+                                   <v-list-item-subtitle>Nombre d'alertes : 0</v-list-item-subtitle>
+                                 </v-list-item-content>
+                               </v-list-item>
+                             </v-list>
+                           </v-card>
+                         </v-dialog>
+                     </v-col>
+                  </v-row>
+               </v-container>
+            </v-toolbar>
+            <v-container>
+               <h1>
+                  Quelques petits graphiques
+               </h1>
+               <v-icon large @click="menu2 = true">mdi-information</v-icon>
+                  <v-dialog
+                    transition="dialog-bottom-transition"
+                    max-width="600"
+                    v-model="menu2"
+                  >
+                  <v-card>
+                    <v-list dense>
+                     <v-subheader>Informations et conseils</v-subheader>
+                     <v-list-item-group
+                       color="primary"
+                     >
+                       <v-list-item>
+                         Si vous voyez une variation anormale de la masse, n'hésitez pas à nous contacter à notre adresse mail : pajot@et.esiea.fr
+                         <br>
+                         Si de plus, une variation est notée pour la température ou l'humidité, la ruche peut connaître un essaimage, donc surveillez ceci de près.
+                         <br>
+                         À noter que les mesures sont faites toutes les 15 minutes, donc n'hésitez pas à actualiser la page ! :)
+                       </v-list-item>
+                     </v-list-item-group>
+                   </v-list>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        text
+                        @click="menu2 = false"
+                      >
+                        Quitter
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+               </v-dialog>
+            </v-container>
+            <v-container>
+               <v-card
+                   class="mx-auto text-center"
+                   color="pink lighten-2"
+                   dark
+                   max-width="600"
+                 >
+                   <v-card-text>
+                     <v-sheet color="rgba(0, 0, 0, .12)">
+                       <v-sparkline
+                         :labels="valeurs_poids"
+                         :value="valeurs_poids"
+                         color="rgba(255, 255, 255, .7)"
+                         height="100"
+                         padding="24"
+                         stroke-linecap="round"
+                         smooth
+                       >
+                       </v-sparkline>
+                     </v-sheet>
+                   </v-card-text>
+
+                   <v-divider></v-divider>
+
+                   <v-card-actions class="justify-center">
+                     <v-btn
+                       block
+                       text
+                     >
+                        <v-icon large>mdi-scale</v-icon>
+                        Tendance de la masse (en kg)
+                     </v-btn>
+                   </v-card-actions>
+                 </v-card>
+               </v-container>
+
+               <v-container>
+                  <v-row>
+                     <v-col>
+                        <v-card
+                         class="mx-auto text-center"
+                         color="amber lighten-1"
+                         dark
+                         max-width="600"
+                       >
+                         <v-card-text>
+                           <v-sheet color="rgba(0, 0, 0, .12)">
+                             <v-sparkline
+                               :labels="valeurs_temperature"
+                               :value="valeurs_temperature"
+                               color="rgba(255, 255, 255, .7)"
+                               height="100"
+                               padding="24"
+                               stroke-linecap="round"
+                               smooth
+                             >
+                             </v-sparkline>
+                           </v-sheet>
+                         </v-card-text>
+
+                         <v-divider></v-divider>
+
+                         <v-card-actions class="justify-center">
+                           <v-btn
+                             block
+                             text
+                           >
+                              <v-icon large>mdi-thermometer</v-icon>
+                              Tendance de la température (en °C)
+                           </v-btn>
+                         </v-card-actions>
+                       </v-card>
+                     </v-col>
+                     <v-col>
+                        <v-card
+                         class="mx-auto text-center"
+                         color="blue lighten-1"
+                         dark
+                         max-width="600"
+                       >
+                         <v-card-text>
+                           <v-sheet color="rgba(0, 0, 0, .12)">
+                             <v-sparkline
+                               :labels="valeurs_humidite"
+                               :value="valeurs_humidite"
+                               color="rgba(255, 255, 255, .7)"
+                               height="100"
+                               padding="24"
+                               stroke-linecap="round"
+                               smooth
+                             >
+                             </v-sparkline>
+                           </v-sheet>
+                         </v-card-text>
+
+                         <v-divider></v-divider>
+
+                         <v-card-actions class="justify-center">
+                           <v-btn
+                             block
+                             text
+                           >
+                              <v-icon large>mdi-water-percent</v-icon>
+                              Tendance de l'humidité (En %)
+                           </v-btn>
+                         </v-card-actions>
+                       </v-card>
+                     </v-col>
+                  </v-row>
+               </v-container>
+               <v-container>
+               <h1>
+                  Détails des derniers messages
+               </h1>
+               </v-container>
+               <v-container>
+                  <v-expansion-panels v-for="message in messages" :key="message.seqNumber">
+                     <v-expansion-panel width="450" height="250" class="ma-1" >
+                        <v-expansion-panel-header width="100%" class="pa-0" color="yellow">
+                           <v-container>
+                              <v-row>
+                                 <v-col cols="2">
+                                    <v-chip color="black" text-color="white" class="font-weight-bold"> <v-icon large>mdi-bee</v-icon> </v-chip>
+                                 </v-col>
+                                 <v-col>
+                                    {{ getTime(message) }}
+                                 </v-col>
+                              </v-row>
+                           </v-container>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content height="400">
+                          <!-- Voici notre composant, qui prend pas mal de props, et qui n'est pas très compliqué, juste un affichage classique et on utilise les fonctions du dessous -->
+                           <message :message="message" :poids_entier="getMasseEntier(message)" :poids_decimal="getMasseDecimal(message)" :temperature_entier="getTemperatureEntier(message)" :temperature_decimal="getTemperatureDecimal(message)" :humidite_entier="getHumiditeEntier(message)" :humidite_decimal="getHumiditeDecimal(message)" :date="getDateTime(message)"></message>
+                        </v-expansion-panel-content>
+                     </v-expansion-panel>
+                  </v-expansion-panels>
+               </v-container>
+            <v-footer padless>
+             <v-col
+               class="text-center"
+               cols="12"
+             >
+               <strong>Ruche connectée - 2020/2021</strong>
+             </v-col>
+           </v-footer>
+
+      </v-app>
+    </div>
+      <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+      <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+      <!-- Voici le composant que nous utilisons -->
+      <script src="js/message.js"></script>
+    <script language="javascript">
+      new Vue({
+        el: '#app',
+        vuetify: new Vuetify(),
+        data:{
+            // Notre variables qui va prendre les messages
+            messages: [],
+            // L'id de la ruche va être stockée là
+            device: "",
+            //Puis les différentes valeurs pour les graphiques
+            valeurs_poids: [],
+            valeurs_temperature: [],
+            valeurs_humidite: [],
+            menu: false,
+            menu2: false,
+            etudiants: ["Matthieu", "Aurélien", "Benjamin", "Zidane"],
+            dialog: false
+        },
+            methods:{
+               getMessages:function(){
+                  let self = this;
+                  //2E6C54 à changer avec l'id de votre ruche
+                  axios.get('messages/2E6C54').then(function(reponse){
+                     let mess = reponse.data;
+                     for(let i = 0; i < mess.length; i++)
+                     {
+                        //Ici, le time est en UNIX TIME et nous avons mis cette valeur pour prendre les messages
+                        //Après une certaine date
+                        //Vous pouvez ne rien mettre ou mettre celle que vous souhaitez
+                        if(mess[i].time >= 1622664059000)
+                        {
+                           self.messages.push(mess[i]);
+                        }
+                     }
+                     mess = self.messages;
+                     self.device = "2E6C54";
+                     //Ici, on récupère les informations pour construire les graphes
+                     //À noter que vous pouvez faire quelque chose de plus propre
+                     self.getValeursMasse(mess);
+                     self.getValeursTemperature(mess);
+                     self.getValeursHumidite(mess);
+                  });
+
+               },
+               //Pour les 6 prochaines fonctions, ceci n'est pas très complexe :
+               //On récupère 1 octets (à chaque fois c'est sur 1), qui sont en string, on les concatène (avec le +)
+               //Puis on converti ce string (qui est en hexa) en entier (grâce au parseInt(..., 16))
+               //Et ensuite, pour chaque fonction get...(message), on a une récupération de la valeur entière et une autre de la valeur décimale
+               getMasseEntier:function(message){
+                  return parseInt(message.data[0]+message.data[1], 16);
+               },
+               getMasseDecimal:function(message){
+                  return parseInt(message.data[2]+message.data[3], 16);
+               },
+               getTemperatureEntier:function(message){
+                  return parseInt(message.data[4]+message.data[5], 16);
+               },
+               getTemperatureDecimal:function(message){
+                  return parseInt(message.data[6]+message.data[7], 16);
+               },
+               getHumiditeEntier:function(message){
+                  return parseInt(message.data[8]+message.data[9], 16);
+               },
+               getHumiditeDecimal:function(message){
+                  return parseInt(message.data[10]+message.data[11], 16);
+               },
+               //On récupère la date d'un message, qui est en UNIXtime, on va donc le convertir en une date plus lisible
+               getDateTime:function(message){
+                  milliseconds = message.time;
+                  let self = this;
+                  
+                  return self.getConvertTime(new Date(milliseconds));
+               },
+               //C'est ici qu'on converti le temps, pour un premier affichage complet (dans les v-expansion-panel-content)
+               getConvertTime:function(time){
+                  let jour = time.toLocaleString("en-GB", {weekday: "long"});
+                  let mois = time.toLocaleString("en-GB", {month: "long"});
+                  let jour_numero = time.toLocaleString("en-GB", {day: "numeric"});
+                  let annee = time.toLocaleString("en-GB", {year: "numeric"});
+                  let heure = time.toLocaleString("en-GB", {hour: "numeric"});
+                  let minute = time.toLocaleString("en-GB", {minute: "numeric"});
+
+                  //Juste pour de la beauté, les fonctions donnent en anglais, on va donc le convertir en français
+                  //Oui c'est pas très très beau, mais ça fonctionne et c'est l'affichage final qui compte :)
+
+                  if(jour == "Monday")
+                     jour = "lundi"
+                  else if(jour == "Tuesday")
+                     jour = "mardi"
+                  else if(jour == "Wednesday")
+                     jour = "mercredi"
+                  else if(jour == "Thursday")
+                     jour = "jeudi"
+                  else if(jour == "Friday")
+                     jour = "Vendredi"
+                  else if(jour == "Saturday")
+                     jour = "samedi"
+                  else
+                     jour = "dimanche"
+
+                  if(mois == "June")
+                     mois = "juin"
+                  else if(mois == "May")
+                     mois = "may"
+                  else if(mois == "February")
+                     mois = "février"
+                  else if(mois == "January")
+                     mois = "janvier"
+                  else if(mois == "March")
+                     mois = "mars"
+                  else if(mois == "April")
+                     mois = "avril"
+                  else if(mois == "July")
+                     mois = "juillet"
+                  else if(mois == "August")
+                     mois = "août"
+                  else if(mois == "September")
+                     mois = "septembre"
+                  else if(mois == "October")
+                     mois = "octobre"
+                  else if(mois == "November")
+                     mois = "novembre"
+                  else if(mois == "December")
+                     mois = "décembre"
+
+                  if(parseInt(minute) < 10)
+                     minute = "0" + minute;
+                  if(parseInt(heure) < 10)
+                     heure = "0" + heure;
+                  if(parseInt(jour_numero) < 10)
+                     jour_numero = "0" + jour_numero;
+
+                  let date_fin = "Le " + jour + " " + jour_numero + " " + mois + " " + annee + " à " + heure + "h" + minute;
+                  return date_fin;
+               },
+               //Ici c'est pour l'affichage dans les v-expansion-panel-header :
+               //(Même fonction que celle du dessus quasiment)
+               getTime:function(message){
+                  let self = this;
+                  time = new Date(message.time);
+
+                  let jour = time.toLocaleString("en-GB", {weekday: "long"});
+                  let mois = time.toLocaleString("en-GB", {month: "long"});
+                  let jour_numero = time.toLocaleString("en-GB", {day: "numeric"});
+                  let annee = time.toLocaleString("en-GB", {year: "numeric"});
+                  let heure = time.toLocaleString("en-GB", {hour: "numeric"});
+                  let minute = time.toLocaleString("en-GB", {minute: "numeric"});
+
+                  if(parseInt(minute) < 10)
+                     minute = "0" + minute;
+                  if(parseInt(heure) < 10)
+                     heure = "0" + heure;
+                  if(parseInt(jour_numero) < 10)
+                     jour_numero = "0" + jour_numero;
+
+                  if(jour == "Monday")
+                     jour = "lundi"
+                  else if(jour == "Tuesday")
+                     jour = "mardi"
+                  else if(jour == "Wednesday")
+                     jour = "mercredi"
+                  else if(jour == "Thursday")
+                     jour = "jeudi"
+                  else if(jour == "Friday")
+                     jour = "Vendredi"
+                  else if(jour == "Saturday")
+                     jour = "samedi"
+                  else
+                     jour = "dimanche"
+
+                  if(mois == "June")
+                     mois = "juin"
+                  else if(mois == "May")
+                     mois = "may"
+                  else if(mois == "February")
+                     mois = "février"
+                  else if(mois == "January")
+                     mois = "janvier"
+                  else if(mois == "March")
+                     mois = "mars"
+                  else if(mois == "April")
+                     mois = "avril"
+                  else if(mois == "July")
+                     mois = "juillet"
+                  else if(mois == "August")
+                     mois = "août"
+                  else if(mois == "September")
+                     mois = "septembre"
+                  else if(mois == "October")
+                     mois = "octobre"
+                  else if(mois == "November")
+                     mois = "novembre"
+                  else if(mois == "December")
+                     mois = "décembre"
+
+
+                  let date_fin = jour_numero + " " + mois + " " + annee + " - " + heure + "h" + minute;
+                  return date_fin;
+
+               },
+               //Pour les 3 prochaines fonctions, on va utiliser les get...(message) vu précédemment
+               //On avait récupérer la valeur entière et décimale séparée
+               //Donc ça ne va pas être compliqué
+               //par exemple, si on a 40 et 34 (en kg par exemple), et bien, on va concaténer 40 + "." + 34 et le convertir en float
+               //Et le tour est joué
+
+               //À noter que ces fonctions sont utilisées pour afficher les graphiques en début de page
+               //La boucle for permet d'utiliser les 11 derniers relevés (vous pouvez en prendre moins ou plus si vous le souhaiter, mais nous avons pensé que 11 rendait l'affichage bien)
+               //Et la fonction inverserListe permet comme son nom l'indique d'inverser la liste, en effet pour avoir à droite du graphique les dernières valeurs (et non à gauche)
+               getValeursMasse:function(donnees){
+                  let self = this;
+                  for(let i = 0; i <= 10; i++)
+                  {
+                     let entier = self.getMasseEntier(donnees[i]);
+                     let float = self.getMasseDecimal(donnees[i]);
+                     let nombre = parseFloat(entier + "." + float);
+                     self.valeurs_poids.push(nombre);
+                  }
+                  self.valeurs_poids = self.inverserListe(self.valeurs_poids);
+               },
+               getValeursTemperature:function(donnees){
+                  let self = this;
+                  for(let i = 0; i <= 10; i++)
+                  {
+                     let entier = self.getTemperatureEntier(donnees[i]);
+                     let float = self.getTemperatureDecimal(donnees[i]);
+                     let nombre = parseFloat(entier + "." + float);
+                     self.valeurs_temperature.push(nombre);
+                  }
+                  self.valeurs_temperature = self.inverserListe(self.valeurs_temperature);
+               },
+               getValeursHumidite:function(donnees){
+                  let self = this;
+                  for(let i = 0; i <= 10; i++)
+                  {
+                     let entier = self.getHumiditeEntier(donnees[i]);
+                     let float = self.getHumiditeDecimal(donnees[i]);
+                     let nombre = parseFloat(entier + "." + float);
+                     self.valeurs_humidite.push(nombre);
+                  }
+                  self.valeurs_humidite = self.inverserListe(self.valeurs_humidite);
+               },
+               inverserListe:function(liste){
+                  let nouvelle_liste = []
+                  for(let i = liste.length - 1; i >= 0; i--)
+                  {
+                     nouvelle_liste.push(liste[i]);
+                  }
+                  return nouvelle_liste;
+               }
+            },
+            created:function(){
+              //Fonction appelée à l'initialisation de la page
+               this.getMessages();
+            },
+            components:{
+          'message':message,
+            },
+      })
+    </script>
+  </body>
+</html>
