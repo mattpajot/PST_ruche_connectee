@@ -17,9 +17,9 @@ var app = express();
 // l'id :
 var id = "2E6C54";
 // notre login :
-var username = "60a57bfe25643237d0aca872";
+var username = "...";
 // notre mot de passe
-var password = "4c1dd72a27b191fe5102cdf06701753d";
+var password = "...";
 
 
 app.use(serve_static(__dirname+"/public"));
