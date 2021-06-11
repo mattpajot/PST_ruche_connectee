@@ -16,9 +16,9 @@ var app = express();
 //Voici les informations de notre API
 // l'id :
 var id = "2E6C54";
-// notre login :
+// votre login : (à rentrer)
 var username = "...";
-// notre mot de passe
+// votre mot de passe (à rentrer)
 var password = "...";
 
 
